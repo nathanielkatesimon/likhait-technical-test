@@ -1,11 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "./components/Sidebar";
 import HistoryPage from "./pages/HistoryPage";
 import Categories from "./pages/Categories";
 import { COLORS } from "./constants/colors";
 
+const getInitialPage = () => {
+  const path = window.location.pathname.slice(1);
+  return path || "history";
+}; 
+
 function App() {
-  const [currentPage, setCurrentPage] = useState("history");
+  const [currentPage, setCurrentPage] = useState(getInitialPage());
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const appStyle: React.CSSProperties = {
@@ -23,6 +28,12 @@ function App() {
   const handleToggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
+
+  useEffect(() => {
+    if(currentPage !== window.location.pathname.slice(1)) {
+      window.history.pushState({}, "", currentPage);
+    }
+  }, [currentPage]);
 
   return (
     <div style={appStyle}>
