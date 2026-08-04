@@ -168,6 +168,43 @@ const Sidebar: React.FC<SidebarProps> = ({
           </svg>
           <span style={navTextStyle}>History</span>
         </button>
+        <button
+          style={navItemStyle(currentPage === "categories")}
+          onClick={() => onNavigate?.("categories")}
+          onMouseEnter={(e) => {
+            if (currentPage !== "categories") {
+              e.currentTarget.style.background = COLORS.primary.p02;
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (currentPage !== "categories") {
+              e.currentTarget.style.background = "transparent";
+            }
+          }}
+        >
+          <svg 
+            width="24" 
+            height="24" 
+            fill="none" 
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke="currentColor" 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth="2" 
+              d="M9.143 4H4.857A.857.857 0 0 0 4 4.857v4.286c0 
+                .473.384.857.857.857h4.286A.857.857 0 0 0 10 
+                9.143V4.857A.857.857 0 0 0 9.143 4Zm10 0h-4.286a.857.857 
+                0 0 0-.857.857v4.286c0 .473.384.857.857.857h4.286A.857.857 
+                0 0 0 20 9.143V4.857A.857.857 0 0 0 19.143 4Zm-10 10H4.857a.857.857 
+                0 0 0-.857.857v4.286c0 .473.384.857.857.857h4.286a.857.857 0 0 0 
+                .857-.857v-4.286A.857.857 0 0 0 9.143 14Zm10 0h-4.286a.857.857 0 0 
+                0-.857.857v4.286c0 .473.384.857.857.857h4.286a.857.857 0 0 0 
+                .857-.857v-4.286a.857.857 0 0 0-.857-.857Z"/>
+          </svg>
+          <span style={navTextStyle}>Categories</span>
+        </button>
       </nav>
     </aside>
   );
