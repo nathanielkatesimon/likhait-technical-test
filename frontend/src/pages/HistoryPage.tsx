@@ -7,7 +7,7 @@ import CategoryBreakdown from "../components/CategoryBreakdown";
 import { CalendarExpenseTable } from "../components/CalendarExpenseTable";
 import { ExpenseForm } from "../components/ExpenseForm";
 import { Modal, Button } from "../vibes";
-import { COLORS } from "../constants/colors";
+import { pageStyle, headerStyle, leftHeaderStyle, titleStyle, loadingStyle } from "../styles/layout";
 
 const HistoryPage: React.FC = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -101,42 +101,6 @@ const HistoryPage: React.FC = () => {
   );
   const total = categories.reduce((sum, cat) => sum + cat.amount, 0);
   const totalCount = categories.reduce((sum, cat) => sum + cat.count, 0);
-
-  const pageStyle: React.CSSProperties = {
-    padding: "48px 64px",
-    minHeight: "100vh",
-    background: COLORS.secondary.s01,
-  };
-
-  const headerStyle: React.CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    gap: "24px",
-    justifyContent: "space-between",
-  };
-
-  const leftHeaderStyle: React.CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    gap: "24px",
-  };
-
-  const titleStyle: React.CSSProperties = {
-    fontSize: "40px",
-    fontWeight: 700,
-    color: COLORS.secondary.s10,
-    margin: 0,
-    flexShrink: 0,
-  };
-
-  const loadingStyle: React.CSSProperties = {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: "48px",
-    fontSize: "18px",
-    color: COLORS.secondary.s08,
-  };
 
   return (
     <div style={pageStyle}>
