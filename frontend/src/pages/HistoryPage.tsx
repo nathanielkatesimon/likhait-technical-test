@@ -7,7 +7,7 @@ import CategoryBreakdown from "../components/CategoryBreakdown";
 import { CalendarExpenseTable } from "../components/CalendarExpenseTable";
 import { ExpenseForm } from "../components/ExpenseForm";
 import { Modal, Button } from "../vibes";
-import { pageStyle, headerStyle, leftHeaderStyle, titleStyle, loadingStyle } from "../styles/layout";
+import { pageStyle, headerStyle, leftHeaderStyle, titleStyle } from "../styles/layout";
 
 const HistoryPage: React.FC = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -95,8 +95,8 @@ const HistoryPage: React.FC = () => {
   // Calculate category breakdown
   const categoryData = expenses.reduce(
     (acc, expense) => {
-      const category = expense.category || "Uncategorized";
-      const category_icon = expense.category_icon || "📊";
+      const category = expense.category.name || "Uncategorized";
+      const category_icon = expense.category.icon || "📊";
       if (!acc[category]) {
         acc[category] = { category_icon, category, amount: 0, count: 0 };
       }

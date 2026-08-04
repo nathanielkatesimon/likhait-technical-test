@@ -55,12 +55,12 @@ export function ExpenseForm({
       <SelectBox
         label="Category"
         options={categoryOptions.map((category) => ({
-          value: category.name,
+          value: category.id.toString(),
           label: category.name,
         }))}
-        value={formData.category}
-        onChange={(e) => handleChange("category", e.target.value)}
-        error={errors.category}
+        value={formData.category_id}  
+        onChange={(e) => handleChange("category_id", e.target.value)}
+        error={errors.category_id}
         fullWidth
         required
       />

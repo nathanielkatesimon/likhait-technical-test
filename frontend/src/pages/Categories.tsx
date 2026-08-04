@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { pageStyle, headerStyle, leftHeaderStyle, titleStyle, loadingStyle } from "../styles/layout";
+import { pageStyle, headerStyle, leftHeaderStyle, titleStyle } from "../styles/layout";
 import { Category, CategoryFormData } from "../types.ts";
 import { createCategory, fetchCategories } from "../services/api.ts";
 import CategoriesTable from "../components/CategoriesTable.tsx";
