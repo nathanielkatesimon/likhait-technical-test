@@ -14,7 +14,7 @@ import { usePagination } from "../hooks/usePagination.ts";
 
 interface CalendarExpenseTableProps {
   expenses: Expense[];
-  newExpense?: Expense;
+  newExpense?: Expense | null;
   isLoading: boolean;
   resetPageOn: number[];
   categoryOptions: Category[];

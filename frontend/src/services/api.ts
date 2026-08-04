@@ -117,6 +117,8 @@ export async function createCategory(data: CategoryFormData): Promise<Category> 
   });
 
   if (!response.ok) {
+    const response_json = await response.json();
+    alert(response_json.errors[0] || "Failed to create category");
     throw new Error("Failed to create category");
   }
 
@@ -137,6 +139,8 @@ export async function updateCategory(id: number, data: Partial<CategoryFormData>
   });
 
   if (!response.ok) {
+    const response_json = await response.json();
+    alert(response_json.errors[0] || "Failed to create category");
     throw new Error("Failed to update category");
   }
 
