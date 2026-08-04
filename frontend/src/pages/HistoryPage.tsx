@@ -86,14 +86,15 @@ const HistoryPage: React.FC = () => {
   const categoryData = expenses.reduce(
     (acc, expense) => {
       const category = expense.category || "Uncategorized";
+      const category_icon = expense.category_icon || "📊";
       if (!acc[category]) {
-        acc[category] = { category, amount: 0, count: 0 };
+        acc[category] = { category_icon, category, amount: 0, count: 0 };
       }
       acc[category].amount += Number(expense.amount);
       acc[category].count += 1;
       return acc;
     },
-    {} as Record<string, { category: string; amount: number; count: number }>,
+    {} as Record<string, { category_icon: string, category: string; amount: number; count: number }>,
   );
 
   const categories = Object.values(categoryData).sort(

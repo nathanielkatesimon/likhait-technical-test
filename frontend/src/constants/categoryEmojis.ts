@@ -1,19 +1,44 @@
 /**
- * Emoji mappings for expense categories
+ * Emojis
  */
 
-export const CATEGORY_EMOJIS: Record<string, string> = {
-  Food: "🍔",
-  Transportation: "🚗",
-  Entertainment: "🎬",
-  Shopping: "🛍️",
-  Bills: "📄",
-  Healthcare: "🏥",
-  Education: "📚",
-  Travel: "✈️",
-  Other: "📦",
-};
+export const CATEGORY_EMOJIS: string[] = [
+  // Food & Drinks
+  "🍔", "🍕", "🍜", "☕", "🍺",
 
-export function getCategoryEmoji(category: string): string {
-  return CATEGORY_EMOJIS[category] || "📦";
-}
+  // Transportation
+  "🚗", "🚌", "⛽", "🚲",
+
+  // Shopping
+  "🛍️", "🛒", "💳",
+
+  // Entertainment
+  "🎬", "🎮", "🎵", "🎨",
+
+  // Bills & Utilities
+  "📄", "💡", "💧", "📶",
+
+  // Health
+  "🏥", "💊", "🩺", "🦷",
+
+  // Education
+  "📚", "🎓", "✏️",
+
+  // Travel
+  "✈️", "🏨", "🧳",
+
+  // Finance
+  "💰", "💸", "🏦", "📈",
+
+  // Home
+  "🏠", "🛋️", "🧹", "🔧",
+
+  // Work
+  "💼", "🖥️", "📅",
+
+  // Gifts & Family
+  "🎁", "👶", "🐶", "❤️",
+
+  // Misc
+  "📦", "⭐", "❓",
+];

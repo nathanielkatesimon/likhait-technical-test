@@ -1,6 +1,10 @@
-import { Category } from "../types";
+import { Category, CategoryFormData } from "../types";
 import { tableStyle, theadStyle, thStyle, tdStyle, actionButtonsStyle, emptyStyle } from "../styles/table.ts";
-import { Button } from "../vibes";
+import { Button, Modal } from "../vibes";
+import { useState } from "react";
+import { CategoryForm } from "./CategoryForm.tsx";
+import { deleteCategory, updateCategory } from "../services/api.ts";
+import { COLORS } from "../constants/colors.ts";
 
 interface CategoriesTableProps {
   categories: Category[];
@@ -8,6 +12,45 @@ interface CategoriesTableProps {
 }
 
 export default function CategoriesTable({categories, onCategoryUpdated}: CategoriesTableProps) {
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const handleEdit = (category: Category) => {
+    setEditingCategory(category);
+    setIsEditModalOpen(true);
+  }
+
+  const handleDelete = (category: Category) => {
+    setDeletingCategory(category);
+    setIsDeleteModalOpen(true);
+  }
+
+  const handleUpdate = async (data: CategoryFormData) => {
+    if(!editingCategory) return;
+    try {
+      await updateCategory(editingCategory.id, data);
+      setIsEditModalOpen(false);
+      setEditingCategory(null);
+      onCategoryUpdated();
+    } catch (error) {
+      console.error("Error updating category:", error);
+    }
+  }
+
+  const confirmDelete = async () => {
+    if (!deletingCategory) return;
+    try {
+      await deleteCategory(deletingCategory.id);
+      setIsDeleteModalOpen(false);
+      setDeletingCategory(null);
+      onCategoryUpdated();
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      alert("Failed to delete category");
+    }
+  }
 
   if (categories.length === 0) {
     return (
@@ -18,6 +61,7 @@ export default function CategoriesTable({categories, onCategoryUpdated}: Categor
       </div>
     );
   } 
+
 
   return (
     <>
@@ -35,19 +79,99 @@ export default function CategoriesTable({categories, onCategoryUpdated}: Categor
               <td style={tdStyle}>{category.icon}</td>
               <td style={tdStyle}>{category.name}</td>
               <td style={{ ...tdStyle, textAlign: "center" }}>
-                <Button
-                  disabled
-                  variant="secondary"
-                  size="small"
-                  onClick={() => void(0)}
-                >
-                  Edit
-                </Button>
+                <div style={{...actionButtonsStyle, justifyContent: "center"}}>
+                  <Button
+                    variant="secondary"
+                    size="small"
+                    onClick={() => handleEdit(category)}
+                    >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="danger"
+                    size="small"
+                    onClick={() => handleDelete(category)}
+                    >
+                    Delete
+                  </Button>
+                </div>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingCategory(null);
+        }}
+        title="Edit Category"
+      >
+        {editingCategory && (
+          <CategoryForm
+            initialData={{
+              name: editingCategory.name,
+              icon: editingCategory.icon,
+            }}
+            onSubmit={handleUpdate}
+            onCancel={() => {
+              setIsEditModalOpen(false);
+              setEditingCategory(null);
+            }}
+            submitLabel="Update Category"
+          />
+        )}
+      </Modal>
+
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeletingCategory(null);
+        }}
+        title="Delete Category"
+      >
+        <div style={{ padding: "1rem 0" }}>
+          <p style={{ marginBottom: "1.5rem", color: COLORS.text.primary }}>
+            Are you sure you want to delete this category?
+          </p>
+          {deletingCategory && (
+            <p style={{ 
+              marginBottom: "1.5rem", 
+              color: COLORS.text.secondary, 
+              background: COLORS.secondary.s01, 
+              padding: "0.5rem", 
+              borderRadius: "10px", 
+              border: `1px solid ${COLORS.secondary.s02}` 
+            }}>
+              {deletingCategory.icon}&nbsp;
+              <strong>{deletingCategory.name}</strong>
+            </p>
+          )}
+          <div
+            style={{
+              display: "flex",
+              gap: "0.5rem",
+              justifyContent: "flex-end",
+            }}
+          >
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setIsDeleteModalOpen(false);
+                setDeletingCategory(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </>
   )
 }

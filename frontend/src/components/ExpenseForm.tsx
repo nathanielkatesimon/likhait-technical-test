@@ -1,12 +1,11 @@
 /**
  * Form component for adding/editing expenses
  */
-
-import React from "react";
 import { ExpenseFormData } from "../types";
 import { EXPENSE_CATEGORIES } from "../constants/categories";
 import { TextField, SelectBox, Button } from "../vibes";
 import { useExpenseForm } from "../hooks/useExpenseForm";
+import { formStyle, buttonGroupStyle } from "../styles/modal_forms";
 
 interface ExpenseFormProps {
   initialData?: Partial<ExpenseFormData>;
@@ -26,18 +25,6 @@ export function ExpenseForm({
       initialData,
       onSubmit,
     });
-
-  const formStyle: React.CSSProperties = {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1rem",
-  };
-
-  const buttonGroupStyle: React.CSSProperties = {
-    display: "flex",
-    gap: "0.5rem",
-    marginTop: "0.5rem",
-  };
 
   const categoryOptions = EXPENSE_CATEGORIES.map((category) => ({
     value: category,

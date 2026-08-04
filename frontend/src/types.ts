@@ -49,3 +49,8 @@ export interface Category {
   name: string;
   icon: string;
 }
+
+export interface CategoryFormData {
+  name: string;
+  icon: string;
+}
