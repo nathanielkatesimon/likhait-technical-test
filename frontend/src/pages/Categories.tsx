@@ -50,14 +50,8 @@ const Categories: React.FC = () => {
       </div>
       
       <div>
-        {loading ? (
-          <div style={loadingStyle}>Loading Categories...</div>
-        ) : (
-          <CategoriesTable categories={categories} onCategoryUpdated={getCategories} />
-        )}
+        <CategoriesTable categories={categories} isLoading={loading} onCategoryUpdated={getCategories} />
       </div>
-
-
       
       <Modal
         isOpen={isModalOpen}

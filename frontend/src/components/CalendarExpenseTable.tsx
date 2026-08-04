@@ -2,7 +2,7 @@
  * Calendar expense table component
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Expense, ExpenseFormData } from "../types";
 import { formatCurrency, formatDate } from "../utils/expenseUtils";
 import { COLORS } from "../constants/colors";
@@ -10,9 +10,12 @@ import { Button, Modal, Pagination } from "../vibes";
 import { ExpenseForm } from "./ExpenseForm.tsx";
 import { deleteExpense, updateExpense } from "../services/api";
 import { tableStyle, theadStyle, thStyle, tdStyle, actionButtonsStyle, emptyStyle } from "../styles/table.ts";
+import { usePagination } from "../hooks/usePagination.ts";
 
 interface CalendarExpenseTableProps {
   expenses: Expense[];
+  isLoading: boolean;
+  resetPageOn: number[];
   onExpenseUpdated: () => void;
 }
 
@@ -20,18 +23,15 @@ const ITEMS_PER_PAGE = 10;
 
 export function CalendarExpenseTable({
   expenses,
+  isLoading,
+  resetPageOn,
   onExpenseUpdated,
 }: CalendarExpenseTableProps) {
-  const [currentPage, setCurrentPage] = useState(1);
+  const { currentPage, totalPages, setCurrentPage, currentItems: currentExpenses } = usePagination(expenses, ITEMS_PER_PAGE);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [deletingExpense, setDeletingExpense] = useState<Expense | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  const totalPages = Math.ceil(expenses.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentExpenses = expenses.slice(startIndex, endIndex);
 
   const handleEdit = (expense: Expense) => {
     setEditingExpense(expense);
@@ -69,6 +69,10 @@ export function CalendarExpenseTable({
     }
   };
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [...resetPageOn]);
+
   if (expenses.length === 0) {
     return (
       <div style={tableStyle}>
@@ -92,7 +96,14 @@ export function CalendarExpenseTable({
           </tr>
         </thead>
         <tbody>
-          {currentExpenses.map((expense) => (
+          {isLoading ?
+          (<tr>
+            <td colSpan={5} style={{ ...tdStyle, textAlign: "center" }}>
+              Loading...
+            </td>
+          </tr>)
+          : 
+          currentExpenses.map((expense) => (
             <tr key={expense.id}>
               <td style={tdStyle}>{formatDate(new Date(expense.date))}</td>
               <td style={tdStyle}>{expense.description}</td>

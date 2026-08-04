@@ -125,23 +125,19 @@ const HistoryPage: React.FC = () => {
       />
 
       <div>
-        {loading ? (
-          <div style={loadingStyle}>Loading...</div>
-        ) : (
-          <>
-            <CategoryBreakdown
-              categories={categories}
-              total={total}
-              totalCount={totalCount}
-            />
-            <div style={{ marginTop: "32px" }}>
-              <CalendarExpenseTable
-                expenses={expenses}
-                onExpenseUpdated={fetchExpenses}
-              />
-            </div>
-          </>
-        )}
+        <CategoryBreakdown
+          categories={categories}
+          total={total}
+          totalCount={totalCount}
+        />
+        <div style={{ marginTop: "32px" }}>
+          <CalendarExpenseTable
+            resetPageOn={[selectedYear, selectedMonth]}
+            isLoading={loading}
+            expenses={expenses}
+            onExpenseUpdated={fetchExpenses}
+          />
+        </div>
       </div>
 
       <Modal

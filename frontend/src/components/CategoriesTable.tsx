@@ -1,17 +1,22 @@
 import { Category, CategoryFormData } from "../types";
 import { tableStyle, theadStyle, thStyle, tdStyle, actionButtonsStyle, emptyStyle } from "../styles/table.ts";
-import { Button, Modal } from "../vibes";
+import { Button, Modal, Pagination } from "../vibes";
 import { useState } from "react";
 import { CategoryForm } from "./CategoryForm.tsx";
 import { deleteCategory, updateCategory } from "../services/api.ts";
 import { COLORS } from "../constants/colors.ts";
+import { usePagination } from "../hooks/usePagination.ts";
 
 interface CategoriesTableProps {
   categories: Category[];
+  isLoading: boolean;
   onCategoryUpdated: () => void;
 }
 
-export default function CategoriesTable({categories, onCategoryUpdated}: CategoriesTableProps) {
+const ITEMS_PER_PAGE = 10;
+
+export default function CategoriesTable({categories, isLoading, onCategoryUpdated}: CategoriesTableProps) {
+  const {currentPage, setCurrentPage, totalPages, currentItems} = usePagination(categories, ITEMS_PER_PAGE);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
@@ -74,12 +79,19 @@ export default function CategoriesTable({categories, onCategoryUpdated}: Categor
           </tr>
         </thead>
         <tbody>
-          {categories.map((category) => (
-            <tr key={category.id}>
-              <td style={tdStyle}>{category.icon}</td>
-              <td style={tdStyle}>{category.name}</td>
-              <td style={{ ...tdStyle, textAlign: "center" }}>
-                <div style={{...actionButtonsStyle, justifyContent: "center"}}>
+          {isLoading ? 
+            (<tr>
+              <td colSpan={3} style={{ ...tdStyle, textAlign: "center" }}>
+                Loading...
+              </td>
+            </tr>) 
+            :
+            currentItems.map((category) => (
+              <tr key={category.id}>
+                <td style={tdStyle}>{category.icon}</td>
+                <td style={tdStyle}>{category.name}</td>
+                <td style={{ ...tdStyle, textAlign: "center" }}>
+                  <div style={{...actionButtonsStyle, justifyContent: "center"}}>
                   <Button
                     variant="secondary"
                     size="small"
@@ -100,6 +112,12 @@ export default function CategoriesTable({categories, onCategoryUpdated}: Categor
           ))}
         </tbody>
       </table>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
 
       <Modal
         isOpen={isEditModalOpen}
