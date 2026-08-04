@@ -10,6 +10,7 @@ import { Modal, Button } from "../vibes";
 import { pageStyle, headerStyle, leftHeaderStyle, titleStyle } from "../styles/layout";
 
 const HistoryPage: React.FC = () => {
+  const [newExpense, setNewExpense] = useState<Expense|null>(null);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [categoryOptions, setCategoryOptions] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,9 +84,10 @@ const HistoryPage: React.FC = () => {
 
   const handleAddExpense = async (data: ExpenseFormData) => {
     try {
-      await createExpense(data);
+      const result = await createExpense(data);
       setIsModalOpen(false);
-      fetchExpenses();
+      await fetchExpenses();
+      setNewExpense(result);
     } catch (error) {
       console.error("Error creating expense:", error);
       throw error;
@@ -145,6 +147,7 @@ const HistoryPage: React.FC = () => {
             categoryOptions={categoryOptions}
             resetPageOn={[selectedYear, selectedMonth]}
             isLoading={loading}
+            newExpense={newExpense}
             expenses={expenses}
             onExpenseUpdated={fetchExpenses}
           />

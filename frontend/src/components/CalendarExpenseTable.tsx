@@ -14,6 +14,7 @@ import { usePagination } from "../hooks/usePagination.ts";
 
 interface CalendarExpenseTableProps {
   expenses: Expense[];
+  newExpense?: Expense;
   isLoading: boolean;
   resetPageOn: number[];
   categoryOptions: Category[];
@@ -24,12 +25,13 @@ const ITEMS_PER_PAGE = 10;
 
 export function CalendarExpenseTable({
   expenses,
+  newExpense,
   isLoading,
   resetPageOn,
   categoryOptions,
   onExpenseUpdated,
 }: CalendarExpenseTableProps) {
-  const { currentPage, totalPages, setCurrentPage, currentItems: currentExpenses } = usePagination(expenses, ITEMS_PER_PAGE);
+  const { currentPage, totalPages, jumpToItem, setCurrentPage, currentItems: currentExpenses } = usePagination(expenses, ITEMS_PER_PAGE);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [deletingExpense, setDeletingExpense] = useState<Expense | null>(null);
@@ -74,6 +76,12 @@ export function CalendarExpenseTable({
   useEffect(() => {
     setCurrentPage(1);
   }, [...resetPageOn]);
+
+  useEffect(() => {
+    if (newExpense) {
+      jumpToItem((expense) => expense.id === newExpense?.id);
+    }
+  }, [newExpense]);
 
   if (expenses.length === 0) {
     return (

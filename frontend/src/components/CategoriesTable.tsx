@@ -1,7 +1,7 @@
 import { Category, CategoryFormData } from "../types";
 import { tableStyle, theadStyle, thStyle, tdStyle, actionButtonsStyle, emptyStyle } from "../styles/table.ts";
 import { Button, Modal, Pagination } from "../vibes";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CategoryForm } from "./CategoryForm.tsx";
 import { deleteCategory, updateCategory } from "../services/api.ts";
 import { COLORS } from "../constants/colors.ts";
@@ -10,13 +10,14 @@ import { usePagination } from "../hooks/usePagination.ts";
 interface CategoriesTableProps {
   categories: Category[];
   isLoading: boolean;
+  newCategory?: Category | null;
   onCategoryUpdated: () => void;
 }
 
 const ITEMS_PER_PAGE = 10;
 
-export default function CategoriesTable({categories, isLoading, onCategoryUpdated}: CategoriesTableProps) {
-  const {currentPage, setCurrentPage, totalPages, currentItems} = usePagination(categories, ITEMS_PER_PAGE);
+export default function CategoriesTable({categories, isLoading, newCategory, onCategoryUpdated}: CategoriesTableProps) {
+  const {currentPage, setCurrentPage, totalPages, currentItems, jumpToItem} = usePagination(categories, ITEMS_PER_PAGE);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
@@ -56,6 +57,12 @@ export default function CategoriesTable({categories, isLoading, onCategoryUpdate
       alert("Failed to delete category");
     }
   }
+
+  useEffect(() => {
+    if(newCategory){
+      jumpToItem((category) => category.id === newCategory?.id);
+    }
+  }, [newCategory]);
 
   if (categories.length === 0) {
     return (

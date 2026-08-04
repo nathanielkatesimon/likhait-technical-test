@@ -7,6 +7,7 @@ import { CategoryForm } from "../components/CategoryForm.tsx";
 import { Button, Modal } from "../vibes";
 
 const Categories: React.FC = () => {
+  const [newCategory, setNewCategory] = useState<Category|null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,9 +30,10 @@ const Categories: React.FC = () => {
 
   const handleAddCategory = async (data: CategoryFormData) => {
     try {
-      await createCategory(data);
+      const result = await createCategory(data);
       setIsModalOpen(false);
-      getCategories();
+      await getCategories();
+      setNewCategory(result);
     } catch (error) {
       console.error("Error adding category:", error);
       throw error;
@@ -50,7 +52,12 @@ const Categories: React.FC = () => {
       </div>
       
       <div>
-        <CategoriesTable categories={categories} isLoading={loading} onCategoryUpdated={getCategories} />
+        <CategoriesTable 
+          newCategory={newCategory} 
+          categories={categories} 
+          isLoading={loading} 
+          onCategoryUpdated={getCategories} 
+        />
       </div>
       
       <Modal
