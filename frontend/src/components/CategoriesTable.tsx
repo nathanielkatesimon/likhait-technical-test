@@ -1,6 +1,5 @@
 import { Category } from "../types";
 import { tableStyle, theadStyle, thStyle, tdStyle, actionButtonsStyle, emptyStyle } from "../styles/table.ts";
-import { getCategoryEmoji } from "../constants/categoryEmojis";
 import { Button } from "../vibes";
 
 interface CategoriesTableProps {
@@ -33,7 +32,7 @@ export default function CategoriesTable({categories, onCategoryUpdated}: Categor
         <tbody>
           {categories.map((category) => (
             <tr key={category.id}>
-              <td style={tdStyle}>{getCategoryEmoji(category.name)}</td>
+              <td style={tdStyle}>{category.icon}</td>
               <td style={tdStyle}>{category.name}</td>
               <td style={{ ...tdStyle, textAlign: "center" }}>
                 <Button

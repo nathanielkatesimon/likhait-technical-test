@@ -87,6 +87,9 @@ GEM
     concurrent-ruby (1.3.5)
     connection_pool (3.0.2)
     crass (1.0.6)
+    data_migrate (11.3.1)
+      activerecord (>= 6.1)
+      railties (>= 6.1)
     database_cleaner-active_record (2.2.2)
       activerecord (>= 5.a)
       database_cleaner-core (~> 2.0)
@@ -145,6 +148,8 @@ GEM
       net-protocol
     nio4r (2.7.5)
     nokogiri (1.19.0-arm64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.19.0-x86_64-linux-gnu)
       racc (~> 1.4)
     parallel (1.27.0)
     parser (3.3.10.0)
@@ -278,10 +283,12 @@ GEM
 
 PLATFORMS
   arm64-darwin
+  x86_64-linux
 
 DEPENDENCIES
   bootsnap
   brakeman
+  data_migrate (~> 11.3)
   database_cleaner-active_record
   debug
   factory_bot_rails
