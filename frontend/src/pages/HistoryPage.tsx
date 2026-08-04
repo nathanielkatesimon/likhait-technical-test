@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { getExpenses, createExpense } from "../services/api";
-import { Expense, ExpenseFormData } from "../types";
+import { getExpenses, createExpense, fetchCategories } from "../services/api";
+import { Expense, ExpenseFormData, Category } from "../types";
 import YearNavigation from "../components/YearNavigation";
 import { MonthNavigation } from "../components/MonthNavigation";
 import CategoryBreakdown from "../components/CategoryBreakdown";
@@ -11,6 +11,7 @@ import { pageStyle, headerStyle, leftHeaderStyle, titleStyle, loadingStyle } fro
 
 const HistoryPage: React.FC = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -43,6 +44,15 @@ const HistoryPage: React.FC = () => {
   // Initialize URL params if not present
   useEffect(() => {
     updateURL(selectedYear, selectedMonth);
+    const getCategories = async () => {
+      try {
+        const data = await fetchCategories();
+        setCategoryOptions(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    getCategories();
   }, []);
 
   useEffect(() => {
@@ -132,6 +142,7 @@ const HistoryPage: React.FC = () => {
         />
         <div style={{ marginTop: "32px" }}>
           <CalendarExpenseTable
+            categoryOptions={categoryOptions}
             resetPageOn={[selectedYear, selectedMonth]}
             isLoading={loading}
             expenses={expenses}
@@ -146,6 +157,7 @@ const HistoryPage: React.FC = () => {
         title="Add New Expense"
       >
         <ExpenseForm
+          categoryOptions={categoryOptions}
           onSubmit={handleAddExpense}
           onCancel={() => setIsModalOpen(false)}
         />

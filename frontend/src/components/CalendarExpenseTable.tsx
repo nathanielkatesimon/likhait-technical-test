@@ -3,7 +3,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { Expense, ExpenseFormData } from "../types";
+import { Category, Expense, ExpenseFormData } from "../types";
 import { formatCurrency, formatDate } from "../utils/expenseUtils";
 import { COLORS } from "../constants/colors";
 import { Button, Modal, Pagination } from "../vibes";
@@ -16,6 +16,7 @@ interface CalendarExpenseTableProps {
   expenses: Expense[];
   isLoading: boolean;
   resetPageOn: number[];
+  categoryOptions: Category[];
   onExpenseUpdated: () => void;
 }
 
@@ -25,6 +26,7 @@ export function CalendarExpenseTable({
   expenses,
   isLoading,
   resetPageOn,
+  categoryOptions,
   onExpenseUpdated,
 }: CalendarExpenseTableProps) {
   const { currentPage, totalPages, setCurrentPage, currentItems: currentExpenses } = usePagination(expenses, ITEMS_PER_PAGE);
@@ -161,6 +163,7 @@ export function CalendarExpenseTable({
       >
         {editingExpense && (
           <ExpenseForm
+            categoryOptions={categoryOptions}
             initialData={{
               amount: editingExpense.amount.toString(),
               description: editingExpense.description,
