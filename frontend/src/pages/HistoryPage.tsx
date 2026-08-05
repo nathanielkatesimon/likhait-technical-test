@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { getExpenses, createExpense } from "../services/api";
-import { Expense, ExpenseFormData } from "../types";
+import { getExpenses, createExpense, fetchCategories } from "../services/api";
+import { Expense, ExpenseFormData, Category } from "../types";
 import YearNavigation from "../components/YearNavigation";
 import { MonthNavigation } from "../components/MonthNavigation";
 import CategoryBreakdown from "../components/CategoryBreakdown";
 import { CalendarExpenseTable } from "../components/CalendarExpenseTable";
 import { ExpenseForm } from "../components/ExpenseForm";
 import { Modal, Button } from "../vibes";
-import { COLORS } from "../constants/colors";
+import { pageStyle, headerStyle, leftHeaderStyle, titleStyle } from "../styles/layout";
 
 const HistoryPage: React.FC = () => {
+  const [newExpense, setNewExpense] = useState<Expense|null>(null);
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -43,6 +45,15 @@ const HistoryPage: React.FC = () => {
   // Initialize URL params if not present
   useEffect(() => {
     updateURL(selectedYear, selectedMonth);
+    const getCategories = async () => {
+      try {
+        const data = await fetchCategories();
+        setCategoryOptions(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    getCategories();
   }, []);
 
   useEffect(() => {
@@ -73,9 +84,10 @@ const HistoryPage: React.FC = () => {
 
   const handleAddExpense = async (data: ExpenseFormData) => {
     try {
-      await createExpense(data);
+      const result = await createExpense(data);
       setIsModalOpen(false);
-      fetchExpenses();
+      await fetchExpenses();
+      setNewExpense(result);
     } catch (error) {
       console.error("Error creating expense:", error);
       throw error;
@@ -85,15 +97,16 @@ const HistoryPage: React.FC = () => {
   // Calculate category breakdown
   const categoryData = expenses.reduce(
     (acc, expense) => {
-      const category = expense.category || "Uncategorized";
+      const category = expense.category.name || "Uncategorized";
+      const category_icon = expense.category.icon || "📊";
       if (!acc[category]) {
-        acc[category] = { category, amount: 0, count: 0 };
+        acc[category] = { category_icon, category, amount: 0, count: 0 };
       }
       acc[category].amount += Number(expense.amount);
       acc[category].count += 1;
       return acc;
     },
-    {} as Record<string, { category: string; amount: number; count: number }>,
+    {} as Record<string, { category_icon: string, category: string; amount: number; count: number }>,
   );
 
   const categories = Object.values(categoryData).sort(
@@ -101,42 +114,6 @@ const HistoryPage: React.FC = () => {
   );
   const total = categories.reduce((sum, cat) => sum + cat.amount, 0);
   const totalCount = categories.reduce((sum, cat) => sum + cat.count, 0);
-
-  const pageStyle: React.CSSProperties = {
-    padding: "48px 64px",
-    minHeight: "100vh",
-    background: COLORS.secondary.s01,
-  };
-
-  const headerStyle: React.CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    gap: "24px",
-    justifyContent: "space-between",
-  };
-
-  const leftHeaderStyle: React.CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    gap: "24px",
-  };
-
-  const titleStyle: React.CSSProperties = {
-    fontSize: "40px",
-    fontWeight: 700,
-    color: COLORS.secondary.s10,
-    margin: 0,
-    flexShrink: 0,
-  };
-
-  const loadingStyle: React.CSSProperties = {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: "48px",
-    fontSize: "18px",
-    color: COLORS.secondary.s08,
-  };
 
   return (
     <div style={pageStyle}>
@@ -160,23 +137,21 @@ const HistoryPage: React.FC = () => {
       />
 
       <div>
-        {loading ? (
-          <div style={loadingStyle}>Loading...</div>
-        ) : (
-          <>
-            <CategoryBreakdown
-              categories={categories}
-              total={total}
-              totalCount={totalCount}
-            />
-            <div style={{ marginTop: "32px" }}>
-              <CalendarExpenseTable
-                expenses={expenses}
-                onExpenseUpdated={fetchExpenses}
-              />
-            </div>
-          </>
-        )}
+        <CategoryBreakdown
+          categories={categories}
+          total={total}
+          totalCount={totalCount}
+        />
+        <div style={{ marginTop: "32px" }}>
+          <CalendarExpenseTable
+            categoryOptions={categoryOptions}
+            resetPageOn={[selectedYear, selectedMonth]}
+            isLoading={loading}
+            newExpense={newExpense}
+            expenses={expenses}
+            onExpenseUpdated={fetchExpenses}
+          />
+        </div>
       </div>
 
       <Modal
@@ -185,6 +160,7 @@ const HistoryPage: React.FC = () => {
         title="Add New Expense"
       >
         <ExpenseForm
+          categoryOptions={categoryOptions}
           onSubmit={handleAddExpense}
           onCancel={() => setIsModalOpen(false)}
         />

@@ -2,17 +2,22 @@
  * Calendar expense table component
  */
 
-import React, { useState } from "react";
-import { Expense, ExpenseFormData } from "../types";
+import { useEffect, useState } from "react";
+import { Category, Expense, ExpenseFormData } from "../types";
 import { formatCurrency, formatDate } from "../utils/expenseUtils";
-import { getCategoryEmoji } from "../constants/categoryEmojis";
 import { COLORS } from "../constants/colors";
 import { Button, Modal, Pagination } from "../vibes";
 import { ExpenseForm } from "./ExpenseForm.tsx";
 import { deleteExpense, updateExpense } from "../services/api";
+import { tableStyle, theadStyle, thStyle, tdStyle, actionButtonsStyle, emptyStyle } from "../styles/table.ts";
+import { usePagination } from "../hooks/usePagination.ts";
 
 interface CalendarExpenseTableProps {
   expenses: Expense[];
+  newExpense?: Expense | null;
+  isLoading: boolean;
+  resetPageOn: number[];
+  categoryOptions: Category[];
   onExpenseUpdated: () => void;
 }
 
@@ -20,18 +25,17 @@ const ITEMS_PER_PAGE = 10;
 
 export function CalendarExpenseTable({
   expenses,
+  newExpense,
+  isLoading,
+  resetPageOn,
+  categoryOptions,
   onExpenseUpdated,
 }: CalendarExpenseTableProps) {
-  const [currentPage, setCurrentPage] = useState(1);
+  const { currentPage, totalPages, jumpToItem, setCurrentPage, currentItems: currentExpenses } = usePagination(expenses, ITEMS_PER_PAGE);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [deletingExpense, setDeletingExpense] = useState<Expense | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  const totalPages = Math.ceil(expenses.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentExpenses = expenses.slice(startIndex, endIndex);
 
   const handleEdit = (expense: Expense) => {
     setEditingExpense(expense);
@@ -69,43 +73,15 @@ export function CalendarExpenseTable({
     }
   };
 
-  const tableStyle: React.CSSProperties = {
-    width: "100%",
-    borderCollapse: "collapse",
-    backgroundColor: COLORS.background.main,
-    borderRadius: "0.5rem",
-    overflow: "hidden",
-    border: `1px solid ${COLORS.border}`,
-  };
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [...resetPageOn]);
 
-  const theadStyle: React.CSSProperties = {
-    backgroundColor: COLORS.background.card,
-  };
-
-  const thStyle: React.CSSProperties = {
-    padding: "0.75rem",
-    textAlign: "left",
-    fontWeight: 600,
-    color: COLORS.text.primary,
-    borderBottom: `2px solid ${COLORS.border}`,
-  };
-
-  const tdStyle: React.CSSProperties = {
-    padding: "0.75rem",
-    borderBottom: `1px solid ${COLORS.border}`,
-    color: COLORS.text.primary,
-  };
-
-  const emptyStyle: React.CSSProperties = {
-    padding: "2rem",
-    textAlign: "center",
-    color: COLORS.text.secondary,
-  };
-
-  const actionButtonsStyle: React.CSSProperties = {
-    display: "flex",
-    gap: "0.5rem",
-  };
+  useEffect(() => {
+    if (newExpense) {
+      jumpToItem((expense) => expense.id === newExpense?.id);
+    }
+  }, [newExpense]);
 
   if (expenses.length === 0) {
     return (
@@ -130,7 +106,14 @@ export function CalendarExpenseTable({
           </tr>
         </thead>
         <tbody>
-          {currentExpenses.map((expense) => (
+          {isLoading ?
+          (<tr>
+            <td colSpan={5} style={{ ...tdStyle, textAlign: "center" }}>
+              Loading...
+            </td>
+          </tr>)
+          : 
+          currentExpenses.map((expense) => (
             <tr key={expense.id}>
               <td style={tdStyle}>{formatDate(new Date(expense.date))}</td>
               <td style={tdStyle}>{expense.description}</td>
@@ -142,8 +125,8 @@ export function CalendarExpenseTable({
                     gap: "0.5rem",
                   }}
                 >
-                  <span>{getCategoryEmoji(expense.category)}</span>
-                  <span>{expense.category}</span>
+                  <span>{expense.category.icon}</span>
+                  <span>{expense.category.name}</span>
                 </span>
               </td>
               <td style={{ ...tdStyle, textAlign: "left", fontWeight: 600 }}>
@@ -188,10 +171,11 @@ export function CalendarExpenseTable({
       >
         {editingExpense && (
           <ExpenseForm
+            categoryOptions={categoryOptions}
             initialData={{
               amount: editingExpense.amount.toString(),
               description: editingExpense.description,
-              category: editingExpense.category,
+              category_id: editingExpense.category.id.toString(),
               date: formatDate(new Date(editingExpense.date)),
             }}
             onSubmit={handleUpdate}
