@@ -11,7 +11,7 @@ class FillExistingCategoryIcons < ActiveRecord::Migration[7.2]
       Healthcare: "🏥",
       Education: "📚",
       Travel: "✈️",
-      Other: "📦",
+      Other: "📦"
     }
 
     Category.all.each do |category|

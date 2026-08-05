@@ -29,7 +29,7 @@ RSpec.describe "Api::Categories", type: :request do
       json = JSON.parse(response.body)
 
       expect(json.map { |c| c["name"] }).to eq(
-        ["Food", "Supplies", "Transport"]
+        [ "Food", "Supplies", "Transport" ]
       )
     end
 

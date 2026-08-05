@@ -6,7 +6,7 @@ class Api::CategoriesController < ApplicationController
 
   def create
     category = Category.new(category_params)
-    
+
     if category.save
       render json: category, status: :created
     else
@@ -16,7 +16,7 @@ class Api::CategoriesController < ApplicationController
 
   def update
     category = Category.find(params[:id])
-    
+
     if category.update(category_params)
       render json: category
     else
